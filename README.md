@@ -73,3 +73,18 @@ following colon-separated patterns:
 
 * @RECORDINSTANCE arm num:record id
 * @FORMINSTANCE event ref:form instance number
+
+It is these saved values that will appear in reports and exports. Values will not be labelled with custom record, event or instance labels.
+
+## Example 
+This example shows a project illustrating the @EVENTINSTANCE and @FORMINSTANCE action tags. The project records are individuals that have a number associated people: "family" (recorded on the "Associated Person" form in the "Family" event) and "friends" (recorded on the "Associated Person" form in the "Friends" event). There is also a repeating event with an event form. Calls associated with the people or events are recorded in the "Call" form of the "Calls" event. The following action tag usage is illustrated:
+* Field calleventinstance; @EVENTINSTANCE=event_1_arm_1
+  Select an instance of the repeating event_1_arm_1 event. 
+* Field callfamilyinstance; @FORMINSTANCE=family_arm_1:associated_person
+  Select an instance of the a family member from the "Family" event.
+* Field callfriendinstance; @FORMINSTANCE=friend_arm_1:associated_person
+  Select an instance of the a friend from the "Friends" event.
+* Field callfamilyorfriendinstance; @FORMINSTANCE=associated_person
+  Select an instance of the "Associated Person" form from any event - either "Family" or "Friends".
+
+![@INSTANCESELECT example](./instance-select.png)
