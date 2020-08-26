@@ -317,7 +317,7 @@ $(document).ready(function() {
                 foreach ($instancesHolder as $instances) {
                         foreach (array_keys($instances) as $instance) {
                                 $custom_event_label = Piping::replaceVariablesInLabel($this->Proj->eventInfo[$eventId]['custom_event_label'], $this->record, $eventId, $instance, $recordData, false, null, false);
-                                $selectItems[$instance] = (trim($custom_event_label)==='') ? $instance : $instance.': '.filter_tags($custom_event_label);
+                                $selectItems[$instance] = (trim($custom_event_label)==='') ? $instance : $instance.': '.filter_tags($custom_event_label, false, true);
                         }
                 }
 
@@ -345,7 +345,7 @@ $(document).ready(function() {
                                 // Loop through instances
                                 foreach (array_keys($attr['repeat_instances'][$event_id][$form_name]) as $instance) {
                                         $pipedLabel = trim(Piping::replaceVariablesInLabel($pre_piped_label, $record, $event_id, $instance, $piping_data, false, null, false, $form_name));
-                                        $pipedFormLabels[$record][$instance] = $pipedLabel;
+                                        $pipedFormLabels[$record][$instance] = filter_tags($pipedLabel, false, true);
                                 }
                         }
                 }
