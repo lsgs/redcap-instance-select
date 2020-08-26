@@ -345,7 +345,7 @@ $(document).ready(function() {
                                 // Loop through instances
                                 foreach (array_keys($attr['repeat_instances'][$event_id][$form_name]) as $instance) {
                                         $pipedLabel = trim(Piping::replaceVariablesInLabel($pre_piped_label, $record, $event_id, $instance, $piping_data, false, null, false, $form_name));
-                                        $pipedFormLabels[$record][$instance] = filter_tags($pipedLabel, false, true);
+                                        $pipedFormLabels[$record][$instance] = strip_tags($pipedLabel);
                                 }
                         }
                 }
