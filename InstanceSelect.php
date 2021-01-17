@@ -1,12 +1,12 @@
 <?php
 /**
  * InstanceSelect
- * 
- * Custom action tags can be used on text fields: 
+ *
+ * Custom action tags can be used on text fields:
  * @RECORDINSTANCE=myarmnum
  * @FORMINSTANCE=myformname or @FORMINSTANCE=myeventname_arm_n:myformname
  * @EVENTINSTANCE=myeventname_arm_n
- * 
+ *
  * Records are not labelled in survey view in case custom label contains PHI
  */
 namespace MCRI\InstanceSelect;
@@ -31,7 +31,7 @@ class InstanceSelect extends AbstractExternalModule
 
         protected $isSurvey=false;
         protected $taggedFields=array();
-        
+
         protected $Proj;
         protected $lang;
         protected $user_rights;
@@ -46,17 +46,17 @@ class InstanceSelect extends AbstractExternalModule
                 $this->lang = &$lang; //nb. $lang is an array which is apparently not an object, so & required to assign by reference
                 $this->user_rights = &$user_rights;
         }
-        
+
         public function redcap_data_entry_form_top($project_id, $record, $instrument, $event_id, $group_id, $repeat_instance) {
                 $this->initHook($record, $instrument, $event_id, $repeat_instance);
                 $this->pageTop();
         }
-        
+
         public function redcap_survey_page_top($project_id, $record, $instrument, $event_id, $group_id, $survey_hash, $response_id, $repeat_instance) {
                 $this->initHook($record, $instrument, $event_id, $repeat_instance, true);
                 $this->pageTop();
         }
-        
+
         protected function initHook($record, $instrument, $event_id, $repeat_instance, $isSurvey=false) {
             $this->record = $record;
             $this->instrument = $instrument;
@@ -64,33 +64,33 @@ class InstanceSelect extends AbstractExternalModule
             $this->repeat_instance = $repeat_instance;
             $this->isSurvey = $isSurvey;
         }
-        
+
         protected function pageTop() {
                 $this->setTaggedFields();
-                
+
                 if (count($this->taggedFields)>0) {
                         // write the JavaScript to the page
                         $this->insertJS();
                 }
         }
-        
+
         protected function setTaggedFields() {
-            
+
                 // find tagged fields
-                
+
                 foreach(array_keys($this->Proj->forms[$this->instrument]['fields']) as $field) {
                         $fieldMetadata = $this->Proj->metadata[$field];
-                        
-                        if ($fieldMetadata['element_type']!=='text' || 
-                            $fieldMetadata['element_validation_type']!==null || 
-                            $fieldMetadata['misc']===null ) { 
-                                continue; 
+
+                        if ($fieldMetadata['element_type']!=='text' ||
+                            $fieldMetadata['element_validation_type']!==null ||
+                            $fieldMetadata['misc']===null ) {
+                                continue;
                         }
-                        
+
                         list($tag, $param) = $this->getTagAndParam($fieldMetadata['misc']);
-                        
+
                         if (is_null($tag)) { continue; }
-                        
+
                         $optionList = $this->getLookupOptions($tag, $param, $this->record, $this->event_id);
 
                         if (!is_array($optionList)) { continue; } // skip this field if not correctly specified
@@ -117,8 +117,10 @@ class InstanceSelect extends AbstractExternalModule
                         );
                 }
         }
-        
+
         protected function insertJS() {
+          $parent_instance = ($_GET['parent_instance'] == null
+            || empty($_GET['parent_instance'])) ? -1 : $_GET['parent_instance'];
 ?>
 <script type='text/javascript'>
 $(document).ready(function() {
@@ -137,23 +139,37 @@ $(document).ready(function() {
         } else {
             // Make a select list with the appropriate options
             replaceField.append($("<option>"));
+            // pick up parent instance from URL, possibly set by companion EM InstanceTable
+            var parent_instance = <?php echo $parent_instance?>;
+            var parent_selected = false;
             for (var optVal in taggedField.lookup) {
-                if (optVal===taggedField.currentValue) {
+                if (optVal===taggedField.currentValue || optVal===parent_instance.toString()) {
                     replaceField.append($("<option>").attr('value',optVal).text(taggedField.lookup[optVal]).prop('selected', true));
+                    parent_selected = true;
                 } else {
                     replaceField.append($("<option>").attr('value',optVal).text(taggedField.lookup[optVal]));
                 }
             }
+            if (!parent_selected) {
+              if (taggedField.currentValue) {
+                replaceField.append($("<option>")
+                  .attr('value', taggedField.currentValue).text(taggedField.currentValue + ': DELETED').prop
+                  ('selected', true));
+              } else if (parent_instance !== -1 ){
+                replaceField.append($("<option>")
+                  .attr('value', parent_instance).text(parent_instance + ': NEW').prop('selected', true));
+              }
+            }
         }
 
-        // Replace the field text box input 
+        // Replace the field text box input
         $('input:text[name="' + taggedField.name + '"]').replaceWith(replaceField);
     });
 });
 </script>
 <?php
         }
-        
+
         protected function getTagAndParam($fieldAnnotation) {
             foreach (array_keys(static::$Tags) as $tag) {
                     if (strpos($fieldAnnotation, $tag) !== false) {
@@ -162,7 +178,7 @@ $(document).ready(function() {
             }
             return array(null, null);
         }
-        
+
         protected function getLookupOptions($term, $param) {
                 switch ($term) {
                     case '@RECORDINSTANCE': return $this->getArmRecordInstances($param); break;
@@ -176,7 +192,7 @@ $(document).ready(function() {
         protected function getArmRecordInstances($param) {
                 global $custom_record_label;
 
-                // $param can be comma-separated list of arm numbers (or if empty use arm of current record/event) 
+                // $param can be comma-separated list of arm numbers (or if empty use arm of current record/event)
                 // include arm name in labels if multiple in project
                 $param = (is_null($param) || $param=='') ? ''.$this->Proj->eventInfo[$this->event_id]['arm_num'] : str_replace("'", '', $param);
 
@@ -244,7 +260,7 @@ $(document).ready(function() {
                         $lookupForm = $lookupParams[1];
                         $lookupEvents = array(
                                 $eventId =>
-                                $this->Proj->RepeatingFormsEvents[$eventId][$lookupForm] // the repeating form label 
+                                $this->Proj->RepeatingFormsEvents[$eventId][$lookupForm] // the repeating form label
                         );
                 } else {
                         $lookupForm = $lookupParams[0];
@@ -258,8 +274,8 @@ $(document).ready(function() {
 
                 $eventPipedFormLabels = array();
 
-                // annoyingly, RepeatInstance::getPipedCustomRepeatingFormLabels() gives 
-                // an array with one unlabelled instance if record exists in another 
+                // annoyingly, RepeatInstance::getPipedCustomRepeatingFormLabels() gives
+                // an array with one unlabelled instance if record exists in another
                 // arm but has no form instances in that other arm
                 foreach (array_keys($lookupEvents) as $eventId) {
                         $eventPipedFormLabels[$eventId] = $this->RepeatInstanceGetPipedCustomRepeatingFormLabelsMod($this->record, $eventId, $lookupForm);
@@ -350,11 +366,11 @@ $(document).ready(function() {
                         }
                 }
                 // Return the array containing the piped repeating form labels
-                return $pipedFormLabels;		
+                return $pipedFormLabels;
         }
 
         /**
-         * Augment the action_tag_explain content on project Design pages by 
+         * Augment the action_tag_explain content on project Design pages by
          * adding some additional tr following the last built-in action tag.
          * @param type $project_id
          */
@@ -365,17 +381,17 @@ $(document).ready(function() {
 
                         // which $lang element is this?
                         $langElement = array_search($lastActionTagDesc, $this->lang);
-                        
+
                         foreach (static::$Tags as $tag => $tagDesc) {
                                 $lastActionTagDesc .= "</td></tr>";
                                 $lastActionTagDesc .= $this->makeTagTR($tag, $tagDesc);
-                        }                        
+                        }
                         $this->lang[$langElement] = rtrim(rtrim(rtrim(trim($lastActionTagDesc), '</tr>')),'</td>');
                 }
         }
-  
+
         /**
-         * Make a table row for an action tag copied from 
+         * Make a table row for an action tag copied from
          * v8.5.0/Design/action_tag_explain.php
          * @global type $isAjax
          * @param type $tag
