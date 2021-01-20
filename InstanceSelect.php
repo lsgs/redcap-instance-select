@@ -407,10 +407,10 @@ $(document).ready(function() {
 				)
 			) .
 			RCView::td(array('class'=>'nowrap', 'style'=>'background-color:#f5f5f5;color:#912B2B;padding:7px;font-weight:bold;border:1px solid #ccc;border-bottom:0;border-left:0;border-right:0;'),
-				$tag.'<img title="Instance Select External Module" src="../Resources/images/puzzle_small.png" style="margin-left:2px;">'
+				$tag
 			) .
 			RCView::td(array('style'=>'font-size:12px;background-color:#f5f5f5;padding:7px;border:1px solid #ccc;border-bottom:0;border-left:0;'),
-				$description
+                                '<i class="fas fa-cube mr-1"></i>'.$description
 			)
 		);
 
