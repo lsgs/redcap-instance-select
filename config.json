@@ -1,6 +1,6 @@
 {
 	"name": "Instance Select",
-
+	"description": "@FORMINSTANCE, @EVENTINSTANCE and $RECORDINSTANCE action tags for unvalidated text fields that enable you to select a specific instance of a repeating form or event for the current record, or another record from the project.<br><br>When the data entry or survey page loads, a tagged text field will be replaced with a select list with options for each instance of the specified form / event for the current record, or project records.",
 	"namespace": "MCRI\\InstanceSelect",
 
 	"authors": [
@@ -10,13 +10,24 @@
 			"institution": "Murdoch Children's Research Institute"
 		}
 	],
-
-	"description": "@FORMINSTANCE, @EVENTINSTANCE and $RECORDINSTANCE action tags for unvalidated text fields that enable you to select a specific instance of a repeating form or event for the current record, or another record from the project.<br><br>When the data entry or survey page loads, a tagged text field will be replaced with a select list with options for each instance of the specified form / event for the current record, or project records.",
-
+	"framework-version": 14,
+        "action-tags": [
+        {
+            "tag": "@FORMINSTANCE",
+            "description": "Specify a form name @FORMINSTANCE=myformname or unique event name/form name pair @FORMINSTANCE=myevent_arm_1:myformname and the select list will show instances of the specified form for the current record."
+        },
+        {
+            "tag": "@EVENTINSTANCE",
+            "description": "Specify the unique event name @EVENTINSTANCE=myeventname_arm_n and the select list will show instances of the specified event for the current record."
+        },
+        {
+            "tag": "@RECORDINSTANCE",
+            "description": "@RECORDINSTANCE : Select a record from the current project."
+        }
+       ],
 	"permissions": [
              "redcap_data_entry_form_top",
-             "redcap_survey_page_top",
-             "redcap_every_page_before_render"
+             "redcap_survey_page_top"
 	],
 
         "enable-every-page-hooks-on-system-pages": false,
