@@ -39,21 +39,21 @@ class InstanceSelect extends AbstractExternalModule
         protected $record;
         protected $repeat_instance;
 
-        public function __construct() {
-                parent::__construct();
+        public function redcap_data_entry_form_top($project_id, $record, $instrument, $event_id, $group_id, $repeat_instance) {
                 global $Proj, $lang, $user_rights;
                 $this->Proj = $Proj;
                 $this->lang = &$lang; //nb. $lang is an array which is apparently not an object, so & required to assign by reference
                 $this->user_rights = &$user_rights;
-        }
-
-        public function redcap_data_entry_form_top($project_id, $record, $instrument, $event_id, $group_id, $repeat_instance) {
-                $this->initHook($record, $instrument, $event_id, $repeat_instance);
+		$this->initHook($record, $instrument, $event_id, $repeat_instance);
                 $this->pageTop();
         }
 
         public function redcap_survey_page_top($project_id, $record, $instrument, $event_id, $group_id, $survey_hash, $response_id, $repeat_instance) {
-                $this->initHook($record, $instrument, $event_id, $repeat_instance, true);
+                global $Proj, $lang, $user_rights;
+                $this->Proj = $Proj;
+                $this->lang = &$lang; //nb. $lang is an array which is apparently not an object, so & required to assign by reference
+                $this->user_rights = &$user_rights;
+		$this->initHook($record, $instrument, $event_id, $repeat_instance, true);
                 $this->pageTop();
         }
 
@@ -367,52 +367,5 @@ $(document).ready(function() {
                 }
                 // Return the array containing the piped repeating form labels
                 return $pipedFormLabels;
-        }
-
-        /**
-         * Augment the action_tag_explain content on project Design pages by
-         * adding some additional tr following the last built-in action tag.
-         * @param type $project_id
-         */
-        public function redcap_every_page_before_render($project_id) {
-                if (PAGE==='Design/action_tag_explain.php') {
-
-                        $lastActionTagDesc = end(Form::getActionTags());
-
-                        // which $lang element is this?
-                        $langElement = array_search($lastActionTagDesc, $this->lang);
-
-                        foreach (static::$Tags as $tag => $tagDesc) {
-                                $lastActionTagDesc .= "</td></tr>";
-                                $lastActionTagDesc .= $this->makeTagTR($tag, $tagDesc);
-                        }
-                        $this->lang[$langElement] = rtrim(rtrim(rtrim(trim($lastActionTagDesc), '</tr>')),'</td>');
-                }
-        }
-
-        /**
-         * Make a table row for an action tag copied from
-         * v8.5.0/Design/action_tag_explain.php
-         * @global type $isAjax
-         * @param type $tag
-         * @param type $description
-         * @return type
-         */
-        protected function makeTagTR($tag, $description) {
-                global $isAjax;
-                return RCView::tr(array(),
-			RCView::td(array('class'=>'nowrap', 'style'=>'text-align:center;background-color:#f5f5f5;color:#912B2B;padding:7px 15px 7px 12px;font-weight:bold;border:1px solid #ccc;border-bottom:0;border-right:0;'),
-				((!$isAjax || (isset($_POST['hideBtns']) && $_POST['hideBtns'] == '1')) ? '' :
-					RCView::button(array('class'=>'btn btn-xs btn-rcred', 'style'=>'', 'onclick'=>"$('#field_annotation').val(trim('".js_escape($tag)." '+$('#field_annotation').val())); highlightTableRowOb($(this).parentsUntil('tr').parent(),2500);"), $this->lang['design_171'])
-				)
-			) .
-			RCView::td(array('class'=>'nowrap', 'style'=>'background-color:#f5f5f5;color:#912B2B;padding:7px;font-weight:bold;border:1px solid #ccc;border-bottom:0;border-left:0;border-right:0;'),
-				$tag
-			) .
-			RCView::td(array('style'=>'font-size:12px;background-color:#f5f5f5;padding:7px;border:1px solid #ccc;border-bottom:0;border-left:0;'),
-                                '<i class="fas fa-cube mr-1"></i>'.$description
-			)
-		);
-
         }
 }
