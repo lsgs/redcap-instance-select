@@ -37,27 +37,24 @@ class InstanceSelect extends AbstractExternalModule
         protected $user_rights;
         protected $event_id;
         protected $record;
+        protected $instrument;
         protected $repeat_instance;
 
         public function redcap_data_entry_form_top($project_id, $record, $instrument, $event_id, $group_id, $repeat_instance) {
-                global $Proj, $lang, $user_rights;
-                $this->Proj = $Proj;
-                $this->lang = &$lang; //nb. $lang is an array which is apparently not an object, so & required to assign by reference
-                $this->user_rights = &$user_rights;
-		$this->initHook($record, $instrument, $event_id, $repeat_instance);
-                $this->pageTop();
+	    	$this->initHook($record, $instrument, $event_id, $repeat_instance);
+            $this->pageTop();
         }
 
         public function redcap_survey_page_top($project_id, $record, $instrument, $event_id, $group_id, $survey_hash, $response_id, $repeat_instance) {
-                global $Proj, $lang, $user_rights;
-                $this->Proj = $Proj;
-                $this->lang = &$lang; //nb. $lang is an array which is apparently not an object, so & required to assign by reference
-                $this->user_rights = &$user_rights;
-		$this->initHook($record, $instrument, $event_id, $repeat_instance, true);
-                $this->pageTop();
+    		$this->initHook($record, $instrument, $event_id, $repeat_instance, true);
+            $this->pageTop();
         }
 
         protected function initHook($record, $instrument, $event_id, $repeat_instance, $isSurvey=false) {
+            global $Proj, $lang, $user_rights;
+            $this->Proj = $Proj;
+            $this->lang = &$lang; //nb. $lang is an array which is apparently not an object, so & required to assign by reference
+            $this->user_rights = &$user_rights;
             $this->record = $record;
             $this->instrument = $instrument;
             $this->event_id = $event_id;

@@ -2,7 +2,6 @@
 	"name": "Instance Select",
 	"description": "@FORMINSTANCE, @EVENTINSTANCE and $RECORDINSTANCE action tags for unvalidated text fields that enable you to select a specific instance of a repeating form or event for the current record, or another record from the project.<br><br>When the data entry or survey page loads, a tagged text field will be replaced with a select list with options for each instance of the specified form / event for the current record, or project records.",
 	"namespace": "MCRI\\InstanceSelect",
-
 	"authors": [
 		{
 			"name": "Luke Stevens",
@@ -11,33 +10,18 @@
 		}
 	],
 	"framework-version": 14,
-        "action-tags": [
+    "action-tags": [
         {
             "tag": "@FORMINSTANCE",
-            "description": "Specify a form name @FORMINSTANCE=myformname or unique event name/form name pair @FORMINSTANCE=myevent_arm_1:myformname and the select list will show instances of the specified form for the current record."
+            "description": "Tag a text field to obtain a dropdown list of instances of a repeating form.<br>Specify a repeating form name (e.g. <code>@FORMINSTANCE=myformname</code>) or unique event name/form name pair (e.g. <code>@FORMINSTANCE=myevent_arm_1:myformname</code>) and the select list will show instances of the specified form for the current record."
         },
         {
             "tag": "@EVENTINSTANCE",
-            "description": "Specify the unique event name @EVENTINSTANCE=myeventname_arm_n and the select list will show instances of the specified event for the current record."
+            "description": "Tag a text field to obtain a dropdown list of instances of a repeating event.<br>Specify the unique event name (e.g. <code>@EVENTINSTANCE=myeventname_arm_n</code>) and the select list will show instances of the specified event for the current record."
         },
         {
             "tag": "@RECORDINSTANCE",
-            "description": "@RECORDINSTANCE : Select a record from the current project."
+            "description": "Tag a text field to obtain a dropdown list of records within the project.<br>Use <code>@RECORDINSTANCE</code> for a list of record from the current project(/arm).<br>Use <code>@RECORDINSTANCE=2,3</code> for a list record from arms 2 and 3 in the current project."
         }
-       ],
-	"permissions": [
-             "redcap_data_entry_form_top",
-             "redcap_survey_page_top"
-	],
-
-        "enable-every-page-hooks-on-system-pages": false,
-
-	"links": {
-	},
-
-	"system-settings": [
-	],
-	
-	"project-settings": [
-	]
+    ]
 }
