@@ -109,15 +109,15 @@ class InstanceSelect extends AbstractExternalModule
 
                         $this->taggedFields[] = array(
                                 'name' => $field,
-                                'lookup' => $optionList,
-                                'currentValue' => $currentValue
+                                'lookup' => $this->escape($optionList),
+                                'currentValue' => $this->escape($currentValue)
                         );
                 }
         }
 
         protected function insertJS() {
-          $parent_instance = ($_GET['parent_instance'] == null
-            || empty($_GET['parent_instance'])) ? -1 : $_GET['parent_instance'];
+                $parent_instance = ($_GET['parent_instance'] == null
+                    || empty($_GET['parent_instance'])) ? -1 : $this->escape($_GET['parent_instance']);
 ?>
 <script type='text/javascript'>
 $(document).ready(function() {
@@ -330,7 +330,7 @@ $(document).ready(function() {
                 foreach ($instancesHolder as $instances) {
                         foreach (array_keys($instances) as $instance) {
                                 $custom_event_label = Piping::replaceVariablesInLabel($this->Proj->eventInfo[$eventId]['custom_event_label'], $this->record, $eventId, $instance, $recordData, false, null, false);
-                                $selectItems[$instance] = (trim($custom_event_label)==='') ? $instance : $instance.': '.filter_tags($custom_event_label, false, true);
+                                $selectItems[$instance] = (trim($custom_event_label)==='') ? $instance : $instance.': '.$this->escape($custom_event_label, false, true);
                         }
                 }
 
