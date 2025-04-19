@@ -9,7 +9,7 @@
 			"institution": "Murdoch Children's Research Institute"
 		}
 	],
-	"framework-version": 14,
+	"framework-version": 16,
     "action-tags": [
         {
             "tag": "@FORMINSTANCE",
@@ -22,6 +22,10 @@
         {
             "tag": "@RECORDINSTANCE",
             "description": "Tag a text field to obtain a dropdown list of records within the project.<br>Use <code>@RECORDINSTANCE</code> for a list of record from the current project(/arm).<br>Use <code>@RECORDINSTANCE=2,3</code> for a list record from arms 2 and 3 in the current project."
+        },
+        {
+            "tag": "@INSTANCESELECT-AUTOCOMPLETE",
+            "description": "Use alongside one of the other Instance Select action tags to have the dropdown list of instances rendered as an auto-complete list."
         }
     ]
 }

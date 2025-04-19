@@ -11,7 +11,7 @@ When the data entry or survey page loads, a tagged text field will be replaced w
 Specify a form name or unique event name/form name pair and the select list will show instances of the specified form for the current record:
 
 * `@FORMINSTANCE=myformname` : Select an instance of `myformname` from all events in which it is designated
-* `@FORMINSTANCE=myevent_arm_1:myformname` : Select an instance of `myformname` from the `myevent_arm_1` event only
+* `@FORMINSTANCE=myevent_arm_1.myformname` : Select an instance of `myformname` from the `myevent_arm_1` event only
 
 If the (event/)form is not a repeating form then the action tag will be ignored and you will see only the unvalidated text field.
 
@@ -35,6 +35,10 @@ Invalid arm numbers will be ignored.
 
 Users assigned to a DAG will see only records assigned to the same DAG.
 
+### `@INSTANCESELECT-AUTOCOMPLETE`
+
+Use alongside one of the other Instance Select module action tags to have the dropdown list of instances rendered as an auto-complete list rather than a regular select list.
+
 ## Custom Labels
 
 If a custom record label, custom event labels and/or repeat instance labels are configured for the project then the select lists will display instances labelled accordingly.
@@ -51,20 +55,22 @@ In general the data saved to the tagged field will be simply a record id or inst
 * `@RECORDINSTANCE` not specifying a single arm in a project with multiple arms 
 * `@FORMINSTANCE` specified with a form that is repeating in more than one event
 
-In these cases the select list values, and hence saved data values, will use the following colon-separated patterns:
+In these cases the select list values, and hence saved data values, will use the following period-separated patterns:
 
-* `@RECORDINSTANCE` `arm num:record id` e.g. 2:1001
-* `@FORMINSTANCE` `event ref:form instance number` e.g. event_1_arm_1:4
+* `@RECORDINSTANCE` `arm num.record id` e.g. 2.1001
+* `@FORMINSTANCE` `event ref.form instance number` e.g. event_1_arm_1.4
 
 It is these saved values that will appear in reports and exports. Values will not be labelled with custom record, event or instance labels.
+
+Note: Prior to v2.0.0 a colon was used as the separator, but a colon is not a valid character for a REDCap choice field value. Version 2.0.0 will seamlessly convert values with a colon separator to use a period separator where necessary.
 
 ## Example 
 This example shows a project illustrating the @EVENTINSTANCE and @FORMINSTANCE action tags. The project records are individuals that have a number associated people: "family" (recorded on the "Associated Person" form in the "Family" event) and "friends" (recorded on the "Associated Person" form in the "Friends" event). There is also a repeating event with an event form. Calls associated with the people or events are recorded in the "Call" form of the "Calls" event. The following action tag usage is illustrated:
 * Field calleventinstance; `@EVENTINSTANCE=event_1_arm_1`
   Select an instance of the repeating `event_1_arm_1` event. 
-* Field callfamilyinstance; `@FORMINSTANCE=family_arm_1:associated_person`
+* Field callfamilyinstance; `@FORMINSTANCE=family_arm_1.associated_person`
   Select an instance of the a family member from the "Family" event.
-* Field callfriendinstance; `@FORMINSTANCE=friend_arm_1:associated_person`
+* Field callfriendinstance; `@FORMINSTANCE=friend_arm_1.associated_person`
   Select an instance of the a friend from the "Friends" event.
 * Field callfamilyorfriendinstance; `@FORMINSTANCE=associated_person`
   Select an instance of the "Associated Person" form from any event - either "Family" or "Friends".
