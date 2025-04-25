@@ -299,7 +299,7 @@ class InstanceSelect extends AbstractExternalModule
     // If Custom Repeating Form Labels do not exist for this form, then return empty array.
     // This is a modified version of v7.5.2 RepeatInstance::getPipedCustomRepeatingFormLabels()
     // that does not return an instance in an alternative arm where no instance exists
-    protected function RepeatInstanceGetPipedCustomRepeatingFormLabelsMod($records=array(), $event_id, $form_name)
+    protected function RepeatInstanceGetPipedCustomRepeatingFormLabelsMod($records, $event_id, $form_name)
     {
             $pipedFormLabels = array();
             // If not a repeating form, then return empty array
