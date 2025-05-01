@@ -84,8 +84,14 @@ class InstanceSelect extends AbstractExternalModule
                 $this->tags[$tag][$param] = $optionList;
             }
 
-            $this->convertTextFieldToSelect($field, $this->tags[$tag][$param]);
-            $this->taggedFields[$this->escape($field)] = array($tag, $param);
+            $asAutocomplete = str_contains($this->Proj->metadata[$field]['misc'], static::TAG_AUTOSELECT);
+            $this->convertTextFieldToSelect($field, $this->tags[$tag][$param], $asAutocomplete);
+            $this->taggedFields[] = array(
+                'name' => $this->escape($field),
+                'config' => $this->escape(array($tag, $param)),
+                'choices' => $this->escape(\parseEnum($this->Proj->metadata[$field]['element_enum'])),
+                'autocomplete' => $asAutocomplete
+            );
         }
         if (count($this->taggedFields)>0) {
             // write the JavaScript to the page
@@ -94,8 +100,7 @@ class InstanceSelect extends AbstractExternalModule
         }
     }
 
-    protected function convertTextFieldToSelect($field, $optionList) {
-        $asAutocomplete = str_contains($this->Proj->metadata[$field]['misc'], static::TAG_AUTOSELECT);
+    protected function convertTextFieldToSelect($field, $optionList, $asAutocomplete=false) {
         $this->Proj->metadata[$field]['element_type'] = 'select';
         $this->Proj->metadata[$field]['element_validation_type'] = ($asAutocomplete) ? 'autocomplete': '';
         $enumString = '';
@@ -106,13 +111,59 @@ class InstanceSelect extends AbstractExternalModule
     }
 
     protected function insertJS() {
+        $parent_instance = ($_GET['parent_instance'] == null
+            || empty($_GET['parent_instance'])) ? -1 : $this->escape($_GET['parent_instance']);
         ?>
+        <div class='em-instance-select-ac-template nowrap d-none' style='max-width:95%;'>
+        <input role='combobox' type='text' class='x-form-text x-form-field rc-autocomplete' id='rc-ac-input_$name' aria-labelledby='$ariaLabelledBy'
+        ><button listopen='0' tabindex='-1' onclick='enableDropdownAutocomplete();return false;' class='ui-button ui-widget ui-state-default ui-corner-right rc-autocomplete' data-rc-lang-attrs='aria-label=data_entry_444' aria-label='<?=$this->escape(\RCView::tt_js("data_entry_444"))?>'
+        ><img class='rc-autocomplete' src='<?=APP_PATH_IMAGES?>arrow_state_grey_expanded.png' data-rc-lang-attrs='alt=data_entry_444' alt='<?=$this->escape(\RCView::tt_js("data_entry_444"))?>'></button></div>
+
         <script type='text/javascript'>
         $(document).ready(function() {
-            var taggedFields = <?php print json_encode(array_keys($this->taggedFields)); ?>;
+            var taggedFields = <?php print json_encode($this->taggedFields); ?>;
             // Loop through each field_name and disable with message if no instances to select
             $(taggedFields).each(function(i, taggedField) {
-                let thisSelectOptions = $('select[name='+taggedField+'] option');
+                let elem = $('[name='+taggedField.name+']:first');
+                let currentValue = $(elem).val();
+                if ($(elem).is('select')) {
+                    // on DE form already rendered as a select from updated $Proj->metadata
+                } else {
+                    // on survey form initial render is text input so convert to select
+                    var replaceField = $('<select name="'+taggedField.name+'" style="max-width:90%;">');
+                    // Make a select list with the appropriate options
+                    replaceField.append($("<option>"));
+                    // pick up parent instance from URL, possibly set by companion EM InstanceTable
+                    var parent_instance = <?=$parent_instance?>;
+                    var parent_selected = false;
+                    for (var optVal in taggedField.choices) {
+                        if (optVal==currentValue || optVal==parent_instance.toString()) {
+                            replaceField.append($("<option>").attr('value',optVal).text(taggedField.choices[optVal]).prop('selected', true));
+                            parent_selected = true;
+                        } else {
+                            replaceField.append($("<option>").attr('value',optVal).text(taggedField.choices[optVal]));
+                        }
+                    }
+                    if (!parent_selected) {
+                        if (currentValue) {
+                            replaceField.append($("<option>").attr('value', currentValue).text(currentValue + ': DELETED').prop('selected', true));
+                        } else if (parent_instance !== -1 ){
+                            replaceField.append($("<option>").attr('value', parent_instance).text(parent_instance + ': NEW').prop('selected', true));
+                        }
+                    }
+
+                    // Replace the field text box input
+                    $('input:text[name="' + taggedField.name + '"]').replaceWith(replaceField);
+
+                    if (taggedField.autocomplete) {
+                        $(replaceField).addClass('rc-autocomplete');
+                        let acElem = $('.em-instance-select-ac-template:first').clone().removeClass('d-none');
+                        acElem.insertAfter($(replaceField));
+                    }
+                }
+
+                // finally, disable if no instances to select
+                let thisSelectOptions = $('select[name='+taggedField.name+'] option');
                 if (thisSelectOptions.length===1) {
                     // disable if nothing to select (only the empty option)
                     $(thisSelectOptions).eq(0).attr('value','').text('No instances to select');
