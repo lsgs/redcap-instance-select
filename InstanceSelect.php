@@ -64,6 +64,7 @@ class InstanceSelect extends AbstractExternalModule
     }
 
     protected function pageTop() {
+        if (!isset($this->Proj->forms[$this->instrument]['fields'])) return; // do nothing if $_GET['page'] not valid
         // find tagged fields
         foreach(array_keys($this->Proj->forms[$this->instrument]['fields']) as $field) {
             $fieldMetadata = $this->Proj->metadata[$field];
@@ -107,7 +108,7 @@ class InstanceSelect extends AbstractExternalModule
         foreach ($optionList as $val => $lbl) {
             $enumString .= " \n $val, $lbl";
         }
-        $this->Proj->metadata[$field]['element_enum'] = trim($enumString, ' \n');
+        $this->Proj->metadata[$field]['element_enum'] = trim($enumString);
     }
 
     protected function insertJS() {
